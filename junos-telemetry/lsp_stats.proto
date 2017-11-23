@@ -1,5 +1,5 @@
 //
-// Copyrights (c) 2015, Juniper Networks, Inc.
+// Copyrights (c) 2015, 2016, Juniper Networks, Inc.
 // All rights reserved.
 //
 
@@ -30,6 +30,8 @@
 //
 // Version 1.0
 //
+
+syntax = "proto2";
 
 import "telemetry_top.proto";
 
@@ -75,3 +77,4 @@ message LspStatsRecord {
     // Byte rate computed over the most recent 3 second interval
     optional uint64      byte_rate            = 7;
 }
+

@@ -32,8 +32,8 @@ class Firewall
 end
 
 class FirewallStats
-  required :string, :filter_name, 1
-  optional :uint64, :timestamp, 2
+  required :string, :filter_name, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint64, :timestamp, 2, :".telemetry_options" => { :is_timestamp => true }
   repeated ::MemoryUsage, :memory_usage, 3
   repeated ::CounterStats, :counter_stats, 4
   repeated ::PolicerStats, :policer_stats, 5
@@ -41,36 +41,36 @@ class FirewallStats
 end
 
 class MemoryUsage
-  required :string, :name, 1
-  optional :uint64, :allocated, 2
+  required :string, :name, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint64, :allocated, 2, :".telemetry_options" => { :is_gauge => true }
 end
 
 class CounterStats
-  required :string, :name, 1
-  optional :uint64, :packets, 2
-  optional :uint64, :bytes, 3
+  required :string, :name, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint64, :packets, 2, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :bytes, 3, :".telemetry_options" => { :is_counter => true }
 end
 
 class PolicerStats
-  required :string, :name, 1
-  optional :uint64, :out_of_spec_packets, 2
-  optional :uint64, :out_of_spec_bytes, 3
+  required :string, :name, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint64, :out_of_spec_packets, 2, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :out_of_spec_bytes, 3, :".telemetry_options" => { :is_counter => true }
   optional ::ExtendedPolicerStats, :extended_policer_stats, 4
 end
 
 class ExtendedPolicerStats
-  optional :uint64, :offered_packets, 1
-  optional :uint64, :offered_bytes, 2
-  optional :uint64, :transmitted_packets, 3
-  optional :uint64, :transmitted_bytes, 4
+  optional :uint64, :offered_packets, 1, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :offered_bytes, 2, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :transmitted_packets, 3, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :transmitted_bytes, 4, :".telemetry_options" => { :is_counter => true }
 end
 
 class HierarchicalPolicerStats
-  required :string, :name, 1
-  optional :uint64, :premium_packets, 2
-  optional :uint64, :premium_bytes, 3
-  optional :uint64, :aggregate_packets, 4
-  optional :uint64, :aggregate_bytes, 5
+  required :string, :name, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint64, :premium_packets, 2, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :premium_bytes, 3, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :aggregate_packets, 4, :".telemetry_options" => { :is_counter => true }
+  optional :uint64, :aggregate_bytes, 5, :".telemetry_options" => { :is_counter => true }
 end
 
 

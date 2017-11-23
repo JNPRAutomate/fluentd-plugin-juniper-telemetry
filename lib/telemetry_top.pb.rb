@@ -33,12 +33,12 @@ class TelemetryFieldOptions
 end
 
 class TelemetryStream
-  required :string, :system_id, 1
-  optional :uint32, :component_id, 2
-  optional :uint32, :sub_component_id, 3
-  optional :string, :sensor_name, 4
+  required :string, :system_id, 1, :".telemetry_options" => { :is_key => true }
+  optional :uint32, :component_id, 2, :".telemetry_options" => { :is_key => true }
+  optional :uint32, :sub_component_id, 3, :".telemetry_options" => { :is_key => true }
+  optional :string, :sensor_name, 4, :".telemetry_options" => { :is_key => true }
   optional :uint32, :sequence_number, 5
-  optional :uint64, :timestamp, 6
+  optional :uint64, :timestamp, 6, :".telemetry_options" => { :is_timestamp => true }
   optional :uint32, :version_major, 7
   optional :uint32, :version_minor, 8
   optional ::IETFSensors, :ietf, 100

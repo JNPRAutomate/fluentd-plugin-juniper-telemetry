@@ -35,7 +35,7 @@
 // Version 1.0
 //
 
-
+syntax = "proto2"; 
 import "telemetry_top.proto";
 
 //
@@ -49,7 +49,7 @@ extend JuniperNetworksSensors {
 // The top level message is CpuMemoryUtilization
 //
 message CpuMemoryUtilization {
-    repeated CpuMemoryUtilizationSummary  utilization    = 1;
+    repeated CpuMemoryUtilizationSummary  utilization    = 1;    
 }
 
 
@@ -68,7 +68,7 @@ message CpuMemoryUtilizationSummary {
     // The amount of memory that is currently allocated, expressed
     // as percentage of the total (0--100).
     optional int32 utilization                                          = 4;
-
+    
     // Per application based memory utilization for this memory partition
     repeated CpuMemoryUtilizationPerApplication application_utilization = 5;
 

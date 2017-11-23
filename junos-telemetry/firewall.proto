@@ -1,5 +1,5 @@
 //
-// Copyrights (c) 2015, Juniper Networks, Inc.
+// Copyrights (c) 2015, 2016, Juniper Networks, Inc.
 // All rights reserved.
 //
 
@@ -31,6 +31,8 @@
 // Version 1.1
 //
 
+syntax = "proto2";
+
 import "telemetry_top.proto";
 
 //
@@ -59,8 +61,8 @@ message FirewallStats {
     optional uint64 timestamp             = 2 [(telemetry_options).is_timestamp = true];
 
     repeated MemoryUsage memory_usage     = 3;
-    repeated CounterStats counter_stats   = 4;
-    repeated PolicerStats policer_stats   = 5;
+    repeated CounterStats counter_stats   = 4;   
+    repeated PolicerStats policer_stats   = 5;  
     repeated HierarchicalPolicerStats hierarchical_policer_stats = 6;
 }
 
@@ -83,7 +85,7 @@ message MemoryUsage {
 //
 message CounterStats {
     // Counter name
-    required string name                  = 1 [(telemetry_options).is_key = true];
+    required string name                  = 1 [(telemetry_options).is_key = true]; 
 
     // The total number of packets seen by the counter
     optional uint64 packets               = 2 [(telemetry_options).is_counter = true];
@@ -97,7 +99,7 @@ message CounterStats {
 //
 message PolicerStats {
     // Policer instance name
-    required string name                  = 1 [(telemetry_options).is_key = true];
+    required string name                  = 1 [(telemetry_options).is_key = true]; 
 
     // The total number of packets marked out-of-specification by the policer
     optional uint64 out_of_spec_packets   = 2 [(telemetry_options).is_counter = true];
@@ -149,3 +151,4 @@ message HierarchicalPolicerStats {
     // the aggregate policer
     optional uint64 aggregate_bytes       = 5 [(telemetry_options).is_counter = true];
 }
+
