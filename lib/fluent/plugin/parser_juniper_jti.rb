@@ -5,6 +5,9 @@ require 'port.pb.rb'
 require 'lsp_stats.pb.rb'
 require 'logical_port.pb.rb'
 require 'firewall.pb.rb'
+require 'sr_stats_per_sid.pb.rb'
+require 'sr_stats_per_if_egress.pb.rb'
+require 'sr_stats_per_if_ingress.pb.rb'
 require 'cpu_memory_utilization.pb.rb'
 
 module Fluent
@@ -126,6 +129,150 @@ module Fluent
               end
             end
 
+          #####################################################################
+          ### Support for resource /junos/services/segment-routing/sid/usage/ #
+          #####################################################################
+          #datas Dump :  [jnpr_sr_stats_per_sid_ext] { sid_stats { sid_identifier: "801005" instance_identifier: 0 counter_name: "oc-22" ingress_stats {
+          #packets: 3823 bytes: 420530 packet_rate: 43 byte_rate: 4826 } }
+
+          elsif sensor == "jnpr_sr_stats_per_sid_ext"
+
+            resource = "/junos/services/segment-routing/sid/usage/"
+            $log.debug  "Will extract info for Sensor: #{sensor} / Resource #{resource}"
+
+            datas_sensors[sensor]['sid_stats'].each do |datas|
+
+              # Save all info extracted on a list
+              sensor_data = []
+
+              begin
+                ## Extract interface name and clean up
+                sensor_data.push({ 'device' => device_name  })
+                sensor_data.push({ 'lspname' => datas['sid_identifier']  })
+                sensor_data.push({ 'instance_identifier' => datas['instance_identifier']  })
+                sensor_data.push({ 'counter_name' => datas['counter_name']  })
+
+                ## Clean up Current object
+                datas.delete("sid_identifier")
+                datas.delete("instance_identifier")
+                datas.delete("counter_name")
+
+                datas['ingress_stats'].each do |type, value|
+
+                    sensor_data.push({ 'type' =>  'lsp_stats.' + type  })
+                    sensor_data.push({ 'value' => value  })
+
+                    record = build_record(output_format, sensor_data)
+                    yield gpb_time, record
+
+                end
+              rescue => e
+                $log.warn   "Unable to parse " + sensor + " sensor, Error during processing: #{$!}"
+                $log.debug  "Unable to parse " + sensor + " sensor, Data Dump : " + datas_sensors.inspect.to_s
+              end
+            end
+
+          ##############################################################
+          ### Support for resource /junos/services/segment-routing/interface/ingress/usage/ ##
+          ##############################################################
+          elsif sensor == "jnpr_sr_stats_per_if_ingress_ext"
+
+            resource = "/junos/services/segment-routing/interface/ingress/usage/"
+            $log.debug  "Will extract info for Sensor: #{sensor} / Resource #{resource}"
+
+            datas_sensors[sensor]['per_if_records'].each do |datas|
+
+            # Save all info extracted on a list
+            sensor_data = []
+
+            begin
+              ## Extract interface name and clean up
+              sensor_data.push({ 'device' => device_name  })
+              sensor_data.push({ 'interface' => "SR-IN-" + datas['if_name']  })
+
+              ## Clean up Current object
+              datas.delete("if_name")
+
+              # Check if the interface has a parent
+              if datas.key?('parent_ae_name')
+                sensor_data.push({ 'interface_parent' =>  datas['parent_ae_name']  })
+                datas.delete("parent_ae_name")
+              end
+
+                datas['ingress_stats'].each do |type, value|
+                  #convert bytes to if_octest and packets to if_pkts
+		  case type
+                    when "packets"
+                     type = "if_pkts"
+                    when "bytes"
+                     type = "if_octets"
+		  end 
+
+                  local_sensor_data = sensor_data.dup
+
+                    local_sensor_data.push({ 'type' => 'ingress_stats.' + type  })
+                    local_sensor_data.push({ 'value' => value  })
+
+                    record = build_record(output_format, local_sensor_data)
+
+                    yield gpb_time, record
+                end
+            rescue => e
+              $log.warn   "Unable to parse " + sensor + " sensor, Error during processing: #{$!}"
+              $log.debug  "Unable to parse " + sensor + " sensor, Data Dump : " + datas.inspect.to_s
+            end
+          end
+          ##############################################################
+          ### Support for resource /junos/services/segment-routing/interface/egress/usage/ ##
+          ##############################################################
+          ## example data {"counter_name"=>"oc-3", "egress_stats"=>{"packets"=>3, "bytes"=>188, "packet_rate"=>0, "byte_rate"=>0}}
+          elsif sensor == "jnpr_sr_stats_per_if_egress_ext"
+
+            resource = "/junos/services/segment-routing/interface/egress/usage/"
+            $log.debug  "Will extract info for Sensor: #{sensor} / Resource #{resource}"
+
+            datas_sensors[sensor]['per_if_records'].each do |datas|
+
+            # Save all info extracted on a list
+            sensor_data = []
+
+            begin
+              ## Extract interface name and clean up
+              sensor_data.push({ 'device' => device_name  })
+              sensor_data.push({ 'interface' => "SR-OUT-" + datas['if_name']  })
+
+              ## Clean up Current object
+              datas.delete("if_name")
+
+              # Check if the interface has a parent
+              if datas.key?('parent_ae_name')
+                sensor_data.push({ 'interface_parent' =>  datas['parent_ae_name']  })
+                datas.delete("parent_ae_name")
+              end
+
+                datas['egress_stats'].each do |type, value|
+
+                  #convert bytes to if_octest and packets to if_pkts
+		  case type
+                    when "packets"
+                     type = "if_pkts"
+                    when "bytes"
+                     type = "if_octets"
+		  end 
+                  local_sensor_data = sensor_data.dup
+
+                    local_sensor_data.push({ 'type' => 'egress_stats.' + type  })
+                    local_sensor_data.push({ 'value' => value  })
+
+                    record = build_record(output_format, local_sensor_data)
+
+                    yield gpb_time, record
+                end
+            rescue => e
+              $log.warn   "Unable to parse " + sensor + " sensor, Error during processing: #{$!}"
+              $log.debug  "Unable to parse " + sensor + " sensor, Data Dump : " + datas.inspect.to_s
+            end
+          end
           #####################################################################
           ### Support for resource /junos/services/label-switched-path/usage/##
           #####################################################################
