@@ -1,10 +1,11 @@
 require 'juniper_telemetry_lib.rb'
+require 'fluent/plugin/parser'
 
 module Fluent
-  class TextParser
+  class Plugin
     class JuniperAnalyticsdParser < Parser
 
-      Plugin.register_parser("juniper_analyticsd", self)
+      Fluent::Plugin.register_parser("juniper_analyticsd", self)
 
       config_param :output_format, :string, :default => 'structured'
 
@@ -17,7 +18,7 @@ module Fluent
                 @output_format.to_s == "flat" ||
                 @output_format.to_s == "statsd"
 
-          raise ConfigError, "output_format value '#{@output_format}' is not valid. Must be : structured, flat or statsd"
+          raise Fluent::ConfigError, "output_format value '#{@output_format}' is not valid. Must be : structured, flat or statsd"
         end
       end
 

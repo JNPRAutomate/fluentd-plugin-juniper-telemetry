@@ -1,6 +1,7 @@
 require 'json'
+require 'fluent/plugin/output'
 
-class Fluent::FileJsonOutput < Fluent::Output
+class Fluent::Plugin::FileJsonOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('file_json', self)
 
   config_param :file, :string, :default => '/root/fluentd-plugin-juniper-telemetry/fluentd_output.json'
@@ -13,11 +14,10 @@ class Fluent::FileJsonOutput < Fluent::Output
     super
   end
 
-  def emit(tag, es, chain)
+  def oprocess(tag, es)
 
     file = File.open(@file, 'ab')
 
-    chain.next
     es.each do |time, record|
       file.puts record.to_json
     end
