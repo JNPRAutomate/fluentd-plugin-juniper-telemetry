@@ -1,8 +1,10 @@
+require 'fluent/plugin/parser'
+
 module Fluent
-    class TextParser
+    class Plugin
         class JuniperNaParser < Parser
 
-            Plugin.register_parser("juniper_na", self)
+            Fluent::Plugin.register_parser("juniper_na", self)
 
             config_param :output_format, :string, :default => 'structured'
 
@@ -15,7 +17,7 @@ module Fluent
                         @output_format.to_s == "flat" ||
                         @output_format.to_s == "statsd"
 
-                    raise ConfigError, "output_format value '#{@output_format}' is not valid. Must be : structured, flat or statsd"
+                    raise Fluent::ConfigError, "output_format value '#{@output_format}' is not valid. Must be : structured, flat or statsd"
                 end
             end
             # This is the main method. The input "text" is the unit of data to be parsed.
@@ -24,7 +26,7 @@ module Fluent
             def parse(text)
 
                 resources = JSON.parse(text)
-                time = Engine.now
+                time = Fluent::Engine.now
 
                 resources.each do |resource|
                     resource["Resources"].each do |data|
